@@ -7,19 +7,26 @@
 </head>
 <body>
     <h1>Controle de Estoque de Produtos Mineiros</h1>
-    <div id="produto-form">
-        <h2>Adicionar/Atualizar Produto</h2>
-        <label for="produto">Produto:</label>
-        <input type="text" id="produto" placeholder="Nome do Produto">
+
+    <div>
+        <h2>Adicionar Produto</h2>
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" placeholder="Nome do Produto">
+        <label for="descricao">Descrição:</label>
+        <input type="text" id="descricao" placeholder="Descrição">
         <label for="quantidade">Quantidade:</label>
         <input type="number" id="quantidade" placeholder="Quantidade">
-        <label for="valor">Valor (R$):</label>
-        <input type="number" id="valor" placeholder="Valor">
-        <button onclick="adicionarProduto()">Adicionar/Atualizar</button>
+        <label for="precoCompra">Preço de Compra (R$):</label>
+        <input type="number" id="precoCompra" placeholder="Preço de Compra">
+        <label for="precoVenda">Preço de Venda (R$):</label>
+        <input type="number" id="precoVenda" placeholder="Preço de Venda">
+        <button onclick="adicionarProduto()">Adicionar Produto</button>
     </div>
 
-    <h2>Estoque Atual</h2>
-    <ul id="estoque"></ul>
+    <div>
+        <h2>Estoque Atual</h2>
+        <ul id="estoque"></ul>
+    </div>
 
     <script src="estoque.js"></script>
 </body>
