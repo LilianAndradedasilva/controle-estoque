@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Estoque</title>
+</head>
+<body>
+    <h1>Controle de Estoque de Produtos Mineiros</h1>
+
+    <!-- Seção para adicionar novo produto -->
+    <div>
+        <h2>Adicionar Produto</h2>
+        <label for="idProduto">Id:</label>
+        <input type="number" id="idProduto" placeholder="Codigo do produto">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" placeholder="Nome do Produto">
+        <label for="descricao">Descrição:</label>
+        <input type="text" id="descricao" placeholder="Descrição">
+        <label for="quantidade">Quantidade:</label>
+        <input type="number" id="quantidade" placeholder="Quantidade">
+        <label for="precoCompra">Preço de Compra (R$):</label>
+        <input type="number" id="precoCompra" placeholder="Preço de Compra">
+        <label for="precoVenda">Preço de Venda (R$):</label>
+        <input type="number" id="precoVenda" placeholder="Preço de Venda">
+        <button onclick="adicionarProduto()">Adicionar Produto</button>
+    </div>
+
+    <!-- Seção para atualizar o estoque de um produto existente -->
+    <div>
+        <h2>Atualizar Estoque de Produto Existente</h2>
+        <label for="idProduto">Id:</label>
+        <input type="number" id="idProduto" placeholder="Codigo do produto">
+        <label for="nomeAtualizar">Nome do Produto:</label>
+        <input type="text" id="nomeAtualizar" placeholder="Nome do Produto">
+        <label for="quantidadeAtualizar">Quantidade:</label>
+        <input type="number" id="quantidadeAtualizar" placeholder="Quantidade a Atualizar">
+        <button onclick="atualizarEstoqueProduto()">Atualizar Estoque</button>
+    </div>
+
+    <!-- Seção para excluir um produto existente -->
+    <div>
+        <h2>Excluir Produto</h2>
+        <label for="idProduto">Id:</label>
+        <input type="number" id="idProduto" placeholder="Codigo do produto">
+        <label for="nomeExcluir">Nome do Produto:</label>
+        <input type="text" id="nomeExcluir" placeholder="Nome do Produto">
+        <button onclick="excluirProduto()">Excluir Produto</button>
+    </div>
+
+    <!-- Seção para exibir o estoque atual e valores totais -->
+    <div>
+        <h2>Estoque Atual</h2>
+        <ul id="estoque"></ul>
+    </div>
+    <div>
+        <h2>Valores Totais</h2>
+        <p id="valorCompraTotal">Valor Total de Compra: R$ 0.00</p>
+        <p id="valorVendaTotal">Valor Total de Venda: R$ 0.00</p>
+    </div>
+
+    <script>
+        // Classe Produto
+        class Produto {
+            constructor(idProduto, nome, descricao, quantidade, precoCompra, precoVenda) {
+                this.idProduto = idProduto;
+                this.nome = nome;
+                this.descricao = descricao;
+                this.quantidade = quantidade;
+                this.precoCompra = precoCompra;
+                this.precoVenda = precoVenda;
+            }
+        }
+
+        // Armazenando os dados de estoque
+        let estoque = [];
+
+        // Funções de operações
+        function entradaProduto(produto) {
+            estoque.push(produto);
+            atualizarEstoque();
+        }
+
+        function removerProduto(nomeProduto) {
+            estoque = estoque.filter(produto => produto.nome !== nomeProduto);
+            atualizarEstoque();
+        }
+
+        function atualizarQuantidade(idProduto, quantidade) {
+            const produto = estoque.find(produto => produto.idProduto === idProduto);
+            if (produto) {
+                produto.quantidade += quantidade;
+                if (produto.quantidade < 0) produto.quantidade = 0; // Evitar quantidade negativa
+                atualizarEstoque();
+                console.log(`Quantidade de ${produto.nome} atualizada para ${produto.quantidade}.`);
+            } else {
+                alert("Produto não encontrado no estoque");
+            }
+        }
+
+        function adicionarProduto() {
+            const nome = document.getElementById('nome').value;
+            const descricao = document.getElementById('descricao').value;
+            const quantidade = parseInt(document.getElementById('quantidade').value);
+            const precoCompra = parseFloat(document.getElementById('precoCompra').value);
+            const precoVenda = parseFloat(document.getElementById('precoVenda').value);
+
+            const novoProduto = new Produto(Date.now(), nome, descricao, quantidade, precoCompra, precoVenda); // Usando Date.now() para gerar um id único
+            entradaProduto(novoProduto);
+        }
+
+        function atualizarEstoqueProduto() {
+            const nome = document.getElementById('nomeAtualizar').value;
+            const quantidade = parseInt(document.getElementById('quantidadeAtualizar').value);
+            const produto = estoque.find(produto => produto.nome === nome);
+            if (produto) {
+                atualizarQuantidade(produto.idProduto, quantidade);
+            } else {
+                alert("Produto não encontrado no estoque");
+            }
+        }
+
+        function excluirProduto() {
+            const nome = document.getElementById('nomeExcluir').value;
+            const produto = estoque.find(produto => produto.nome === nome);
+            if (produto) {
+                removerProduto(nome);
+            } else {
+                alert("Produto não encontrado no estoque");
+            }
+        }
+
+        function atualizarEstoque() {
+            const estoqueLista = document.getElementById('estoque');
+            estoqueLista.innerHTML = '';
+
+            estoque.forEach(produto => {
+                const item = document.createElement('li');
+               item.textContent = `${produto.idProduto} - ${produto.nome} - ${produto.descricao}: ${produto.quantidade} unidades - R$ ${produto.precoVenda.toFixed(2)} cada`;
+ 
+                estoqueLista.appendChild(item);
+            });
+
+            // Atualizar valores totais
+            calcularValoresTotais();
+        }
+
+        function calcularValoresTotais() {
+            let valorCompraTotal = 0;
+            let valorVendaTotal = 0;
+
+            estoque.forEach(produto => {
+                valorCompraTotal += produto.precoCompra * produto.quantidade;
+                valorVendaTotal += produto.precoVenda * produto.quantidade;
+            });
+
+            document.getElementById('valorCompraTotal').textContent = `Valor Total de Compra: R$ ${valorCompraTotal.toFixed(2)}`;
+            document.getElementById('valorVendaTotal').textContent = `Valor Total de Venda: R$ ${valorVendaTotal.toFixed(2)}`;
+        }
+
+        // Produtos iniciais
+        const produtosIniciais = [
+            new Produto(1, "Pão de queijo", "Tradicional", 6, 14.00, 28.00),
+            new Produto(2, "Pão de queijo recheado Req", "Requeijão", 3, 28.00, 40.00),
+            new Produto(3, "Pão de queijo recheado Goi", "Goiabinha", 2, 28.00, 40.00),
+            new Produto(4, "Pão de queijo recheado Av", "Creme de avelã", 2, 28.00, 40.00),
+            new Produto(5, "Bolinha de queijo", "Tradicional", 1, 24.00, 38.00),
+            new Produto(6, "Coxinha", "Tradicional", 1, 24.00, 38.00),
+            new Produto(7, "Chipa", "Tradicional", 1, 19.00, 35.00),
+            new Produto(8, "Kibe", "Tradicional", 1, 24.00, 38.00),
+            new Produto(9, "Palito Parmesão", "Tradicional", 1, 19.00, 35.00),
+            new Produto(10, "Risole", "Presunto e Queijo", 1, 24.00, 38.00)
+        ];
+
+        produtosIniciais.forEach(produto => entradaProduto(produto));
+    </script>
+</body>
+</html>
